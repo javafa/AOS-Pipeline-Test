@@ -1,0 +1,76 @@
+node {
+     try{
+       def ANDROID_HOME='/Users/donho/Library/Android/sdk'
+       def ADB="$ANDROID_HOME/platform-tools/adb"
+
+       stage('Stage Checkout') {
+         git branch: 'master', url: 'https://github.com/javafa/AOS-Pipeline-Test.git'
+       }
+
+       stage('Stage Build') {
+         sh "./gradlew clean assembleDebug"
+       }
+
+       stage('Stage Unit Tests') {
+         sh "./gradlew testDebugUnitTest"
+       }
+
+       stage('Stage Instumental Tests') {
+         sh "$ADB start-server"
+         def error
+         parallel (
+           launchEmulator: {
+               sh "$ANDROID_HOME/emulator/emulator -avd wxga_tab -prop persist.sys.language=en -prop persist.sys.country=US -no-snapshot-load -no-snapshot-save"
+           },
+           runAndroidTests: {
+               timeout(time: 30, unit: 'SECONDS') {
+                 sh "$ADB wait-for-device"
+               }
+               try {
+                   sh "./gradlew connectedAndroidTest"
+               } catch(e) {
+                   error = e
+               }
+               sh script: 'adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done'
+           }
+         )
+         if (error != null) {
+             throw error
+         }
+       }
+       currentBuild.result = "SUCCESS"
+     } catch (e) {
+       currentBuild.result = "FAILED"
+//    notifyFailed()
+       throw e
+     } finally {
+       stage('Stage Clean') {
+        //   sh script: '/var/lib/jenkins/clean.sh'
+       }
+     }
+}
+
+/* AVD LIST
+
+Requirements
+JDK 8
+
+Under tools/bin dir
+- Install Emulator Package
+./sdkmanager --channel=3 emulator
+- Create AVD
+./avdmanager create avd -n android-27 -k 'system-images;android-27;default;x86_64' --force
+- Package path is not valid 시 해당 패키지 다운로드
+./sdkmanager 'system-images;android-25;default;x86_64'
+- Sdk list
+./sdkmanager --list
+-Test Emulator
+./emulator -avd wxga_tab -prop persist.sys.language=en -prop persist.sys.country=US -no-snapshot-load -no-snapshot-save
+
+- HAXM 설치 Linux
+1. docker exec -itu 0 컨테이너ID bash 
+2. apt-get update
+3. apt-get install cpu-checker
+4. sudo apt-get install qemu-kvm libvirt-bin ubuntu-vm-builder bridge-utils ia32-libs-multiarch
+
+*/

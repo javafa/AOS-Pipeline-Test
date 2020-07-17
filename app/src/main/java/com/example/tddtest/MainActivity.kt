@@ -21,8 +21,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 textMessage.text = "$email 으로 로그인 성공!!"
             }
-            val intent = Intent(this, SubActivity::class.java)
-            startActivity(intent)
+//            val intent = Intent(this, SubActivity::class.java)
+//            startActivity(intent)
         }
     }
 }
