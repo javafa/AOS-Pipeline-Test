@@ -25,4 +25,8 @@ class MainActivity : AppCompatActivity() {
 //            startActivity(intent)
         }
     }
+
+    fun test(){
+        println("do nothing")
+    }
 }
