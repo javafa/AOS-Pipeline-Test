@@ -11,6 +11,10 @@ node {
       sh './gradlew clean assembleDebug'
     }
 
+    stage('Build Release') {
+      sh './gradlew clean assembleRelease'
+    }
+
     stage('Unit Tests') {
       sh './gradlew testDebugUnitTest'
     }
@@ -48,9 +52,6 @@ node {
     //   sh script: '/var/lib/jenkins/clean.sh'
     }
     if(currentBuild.result == 'SUCCESS') {
-        stage('Build Release') {
-            sh './gradlew clean assembleRelease'
-        }
         stage('Archive Files') {
             // Archive the APKs so that they can be downloaded from Jenkins
             echo 'Archiving APKs...'
