@@ -27,6 +27,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun test(){
-        println("do nothing")
+        println("for a testing pipeline")
     }
 }
