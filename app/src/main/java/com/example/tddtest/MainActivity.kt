@@ -29,4 +29,8 @@ class MainActivity : AppCompatActivity() {
     fun test(){
         println("for a testing pipeline")
     }
+    
+    fun test2() {
+
+    }
 }
