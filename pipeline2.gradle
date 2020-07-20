@@ -27,15 +27,15 @@ node {
         //     sh "$ANDROID_HOME/emulator/emulator -avd wxga_tab -prop persist.sys.language=en -prop persist.sys.country=US -no-snapshot-load -no-snapshot-save"
         // },
         runAndroidTests: {
-            timeout(time: 30, unit: 'SECONDS') {
-              sh "$ADB wait-for-device"
-            }
-            try {
-                sh './gradlew connectedAndroidTest'
-            } catch (e) {
-                error = e
-            }
-            // sh script: '/Users/donho/Library/Android/sdk/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do /Users/donho/Library/Android/sdk/platform-tools/adb -s $line emu kill; done'
+          timeout(time: 30, unit: 'SECONDS') {
+            sh "$ADB wait-for-device"
+          }
+          try {
+              sh './gradlew connectedAndroidTest'
+          } catch (e) {
+              error = e
+          }
+          // sh script: '/Users/donho/Library/Android/sdk/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do /Users/donho/Library/Android/sdk/platform-tools/adb -s $line emu kill; done'
         }
       )
       if (error != null) {
@@ -45,28 +45,26 @@ node {
     currentBuild.result = 'SUCCESS'
   } catch (e) {
     currentBuild.result = 'FAILED'
-    //    notifyFailed()
     throw e
   } finally {
     stage('Stage Clean') {
     //   sh script: '/var/lib/jenkins/clean.sh'
     }
     stage('Report') {
-        
-        publishHTML (target : [allowMissing: false,
-                     alwaysLinkToLastBuild: true,
-                     keepAll: true,
-                     reportDir: 'app/build/reports/androidTests/connected',
-                     reportFiles: 'index.html',
-                     reportName: 'mathTeacherReport',
-                     reportTitles: 'math Teacher AOS'])
+      publishHTML (target : [allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'app/build/reports/androidTests/connected',
+                    reportFiles: 'index.html',
+                    reportName: 'mathTeacherReport',
+                    reportTitles: 'math Teacher AOS'])
     }
     if(currentBuild.result == 'SUCCESS') {
-        stage('Archive Files') {
-            // Archive the APKs so that they can be downloaded from Jenkins
-            echo 'Archiving APKs...'
-            archiveArtifacts '**/*.apk'
-        }
+      stage('Archive Files') {
+        // Archive the APKs so that they can be downloaded from Jenkins
+        echo 'Archiving APKs...'
+        archiveArtifacts '**/*.apk'
+      }
     }
   }
 }
