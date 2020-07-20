@@ -7,16 +7,16 @@ node {
       git branch: 'master', url: 'https://github.com/javafa/AOS-Pipeline-Test.git'
     }
 
-    // stage('Build Debug') {
-    //   sh './gradlew clean assembleDebug'
-    // }
-    
-    stage('Build Release') {
-      sh './gradlew clean assembleRelease'
+    stage('Build Debug') {
+      sh './gradlew clean assembleDebug'
     }
 
     stage('Unit Tests') {
       sh './gradlew testDebugUnitTest'
+    }
+    
+    stage('Build Release') {
+      sh './gradlew clean assembleRelease'
     }
 
     stage('Instumental Tests') {
