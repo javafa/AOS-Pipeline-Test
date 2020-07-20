@@ -7,10 +7,10 @@ node {
       git branch: 'master', url: 'https://github.com/javafa/AOS-Pipeline-Test.git'
     }
 
-    stage('Build Debug') {
-      sh './gradlew clean assembleDebug'
-    }
-
+    // stage('Build Debug') {
+    //   sh './gradlew clean assembleDebug'
+    // }
+    
     stage('Build Release') {
       sh './gradlew clean assembleRelease'
     }
@@ -23,9 +23,9 @@ node {
       sh "$ADB start-server"
       def error
       parallel (
-        launchEmulator: {
-            sh "$ANDROID_HOME/emulator/emulator -avd wxga_tab -prop persist.sys.language=en -prop persist.sys.country=US -no-snapshot-load -no-snapshot-save"
-        },
+        // launchEmulator: {
+        //     sh "$ANDROID_HOME/emulator/emulator -avd wxga_tab -prop persist.sys.language=en -prop persist.sys.country=US -no-snapshot-load -no-snapshot-save"
+        // },
         runAndroidTests: {
             timeout(time: 30, unit: 'SECONDS') {
               sh "$ADB wait-for-device"
@@ -35,7 +35,7 @@ node {
             } catch (e) {
                 error = e
             }
-            sh script: '/Users/donho/Library/Android/sdk/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do /Users/donho/Library/Android/sdk/platform-tools/adb -s $line emu kill; done'
+            // sh script: '/Users/donho/Library/Android/sdk/platform-tools/adb devices | grep emulator | cut -f1 | while read line; do /Users/donho/Library/Android/sdk/platform-tools/adb -s $line emu kill; done'
         }
       )
       if (error != null) {
@@ -51,6 +51,16 @@ node {
     stage('Stage Clean') {
     //   sh script: '/var/lib/jenkins/clean.sh'
     }
+    stage('Report') {
+        
+        publishHTML (target : [allowMissing: false,
+                     alwaysLinkToLastBuild: true,
+                     keepAll: true,
+                     reportDir: 'app/build/reports/androidTests/connected',
+                     reportFiles: 'index.html',
+                     reportName: 'mathTeacherReport',
+                     reportTitles: 'math Teacher AOS'])
+    }
     if(currentBuild.result == 'SUCCESS') {
         stage('Archive Files') {
             // Archive the APKs so that they can be downloaded from Jenkins
@@ -60,6 +70,9 @@ node {
     }
   }
 }
+
+
+
 
 /* AVD LIST
 
