@@ -4,7 +4,12 @@ node {
     def ADB = "$ANDROID_HOME/platform-tools/adb"
 
     stage('Checkout') {
+      // credentialsId : ''
       git branch: 'master', url: 'https://github.com/javafa/AOS-Pipeline-Test.git'
+    }
+
+    stage('License Agreement') {
+      sh "yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses"
     }
 
     stage('Build Debug') {
